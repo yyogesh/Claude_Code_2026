@@ -14,3 +14,17 @@ describe("GET /todos", () => {
     expect(res.body).toEqual([{ id: 1, title: "Set up repo", status: "done" }]);
   });
 });
+
+describe("POST /todos", () => {
+  it("should return 400 when title is missing", async () => {
+    const res = await request(app).post("/todos").send({});
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: "title is required" });
+  });
+
+  it("should return 400 when title is empty", async () => {
+    const res = await request(app).post("/todos").send({ title: "" });
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: "title is required" });
+  });
+});
