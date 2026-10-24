@@ -8,10 +8,29 @@ const items = [
   { id: 3, title: "Write docs", status: "open" },
 ];
 
+const DEFAULT_LIMIT = 20;
+const MAX_LIMIT = 100;
+
+// Parses a query value made only of digits; returns NaN for anything else.
+const parseNonNegativeInt = (value) =>
+  typeof value === "string" && /^\d+$/.test(value) ? Number(value) : NaN;
+
+// Query params: status (filter), limit (default 20, max 100), offset (default 0).
 todos.get("/", (req, res) => {
-  const { status } = req.query;
-  const result = status ? items.filter((t) => t.status === status) : items;
-  res.json(result);
+  const { status, limit, offset } = req.query;
+
+  const pageSize = limit === undefined ? DEFAULT_LIMIT : parseNonNegativeInt(limit);
+  if (!(pageSize >= 1)) {
+    return res.status(400).json({ error: "limit must be a positive integer" });
+  }
+  const start = offset === undefined ? 0 : parseNonNegativeInt(offset);
+  if (Number.isNaN(start)) {
+    return res.status(400).json({ error: "offset must be a non-negative integer" });
+  }
+
+  const matching = status ? items.filter((t) => t.status === status) : items;
+  res.set("X-Total-Count", String(matching.length));
+  res.json(matching.slice(start, start + Math.min(pageSize, MAX_LIMIT)));
 });
 
 todos.post("/", (req, res) => {
