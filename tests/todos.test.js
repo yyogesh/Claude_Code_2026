@@ -74,3 +74,33 @@ describe("POST /todos", () => {
     expect(res.body).toEqual({ error: "title is required" });
   });
 });
+// Keep this block last: it removes a seed item, which later GET tests would see.
+describe("DELETE /todos/:id", () => {
+  it.each(["0", "abc", "-1", "1.5"])("should return 400 for id=%s", async (id) => {
+    const res = await request(app).delete(`/todos/${id}`);
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: "id must be a positive integer" });
+  });
+
+  it("should return 404 when the todo does not exist", async () => {
+    const res = await request(app).delete("/todos/999");
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: "todo not found" });
+  });
+
+  it("should delete the todo", async () => {
+    const res = await request(app).delete("/todos/2");
+    expect(res.status).toBe(204);
+
+    const list = await request(app).get("/todos");
+    expect(list.body.map((t) => t.id)).toEqual([1, 3]);
+
+    const again = await request(app).delete("/todos/2");
+    expect(again.status).toBe(404);
+  });
+
+  it("should not reuse a deleted todo's id", async () => {
+    const res = await request(app).post("/todos").send({ title: "New" });
+    expect(res.body.id).toBe(4);
+  });
+});

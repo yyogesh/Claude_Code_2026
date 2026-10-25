@@ -7,6 +7,8 @@ const items = [
   { id: 2, title: "Add status filter", status: "open" },
   { id: 3, title: "Write docs", status: "open" },
 ];
+// A counter rather than items.length + 1, so IDs aren't reused after a delete.
+let nextId = items.length + 1;
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 100;
@@ -38,9 +40,22 @@ todos.post("/", (req, res) => {
   if (typeof title !== "string" || title.trim() === "") {
     return res.status(400).json({ error: "title is required" });
   }
-  const item = { id: items.length + 1, title, status: "open" };
+  const item = { id: nextId++, title, status: "open" };
   items.push(item);
   res.status(201).json(item);
+});
+
+todos.delete("/:id", (req, res) => {
+  const id = parseNonNegativeInt(req.params.id);
+  if (!(id >= 1)) {
+    return res.status(400).json({ error: "id must be a positive integer" });
+  }
+  const index = items.findIndex((t) => t.id === id);
+  if (index === -1) {
+    return res.status(404).json({ error: "todo not found" });
+  }
+  items.splice(index, 1);
+  res.status(204).end();
 });
 
 
