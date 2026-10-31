@@ -9,8 +9,8 @@ describe("GET /todos", () => {
     expect(res.body.length).toBe(3);
   });
 
-  it("should filter by status", async () => {
-    const res = await request(app).get("/todos?status=done");
+  it("should filter by state", async () => {
+    const res = await request(app).get("/todos?state=done");
     expect(res.body).toEqual([{ id: 1, title: "Set up repo", status: "done" }]);
   });
 
@@ -36,8 +36,8 @@ describe("GET /todos", () => {
     expect(res.headers["x-total-count"]).toBe("3");
   });
 
-  it("should paginate within the status filter", async () => {
-    const res = await request(app).get("/todos?status=open&limit=1&offset=1");
+  it("should paginate within the state filter", async () => {
+    const res = await request(app).get("/todos?state=open&limit=1&offset=1");
     expect(res.body).toEqual([{ id: 3, title: "Write docs", status: "open" }]);
     expect(res.headers["x-total-count"]).toBe("2");
   });

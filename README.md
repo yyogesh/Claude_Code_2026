@@ -13,8 +13,16 @@ A small Express API for managing todos.
 
 The response body is a plain array. The `X-Total-Count` header gives the total number of matching items, across all pages. An invalid `limit` or `offset` returns `400` with an error message.
 
-Pagination applies after the `status` filter, so `limit`, `offset` and `X-Total-Count` all refer to the filtered list:
+Pagination applies after the `state` filter, so `limit`, `offset` and `X-Total-Count` all refer to the filtered list:
 
 ```sh
-curl -i "http://localhost:3000/todos?status=open&limit=10&offset=10"
+curl -i "http://localhost:3000/todos?state=open&limit=10&offset=10"
 ```
+
+
+Mac: brew install jq. Ubuntu: sudo apt-get install jq. Windows: winget install jqlang.jq
+
+chmod +x .claude/hooks/*.sh
+
+
+echo '{"tool_input":{"file_path":"package-lock.json"}}' | .claude/hooks/protect-files.sh; echo "exit $?"

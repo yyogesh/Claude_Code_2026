@@ -17,9 +17,9 @@ const MAX_LIMIT = 100;
 const parseNonNegativeInt = (value) =>
   typeof value === "string" && /^\d+$/.test(value) ? Number(value) : NaN;
 
-// Query params: status (filter), limit (default 20, max 100), offset (default 0).
+// Query params: state (filter), limit (default 20, max 100), offset (default 0).
 todos.get("/", (req, res) => {
-  const { status, limit, offset } = req.query;
+  const { state, limit, offset } = req.query;
 
   const pageSize = limit === undefined ? DEFAULT_LIMIT : parseNonNegativeInt(limit);
   if (!(pageSize >= 1)) {
@@ -30,7 +30,7 @@ todos.get("/", (req, res) => {
     return res.status(400).json({ error: "offset must be a non-negative integer" });
   }
 
-  const matching = status ? items.filter((t) => t.status === status) : items;
+  const matching = state ? items.filter((t) => t.status === state) : items;
   res.set("X-Total-Count", String(matching.length));
   res.json(matching.slice(start, start + Math.min(pageSize, MAX_LIMIT)));
 });
